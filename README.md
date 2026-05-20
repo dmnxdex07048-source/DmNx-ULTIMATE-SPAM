@@ -22,7 +22,7 @@ local pattern = "_"
 local roMessages = {
 	"TMX MEH FIRE 🔥","FYTER BNEGA?🤣","BCHE LEWIS ON TOP👑","TMX MEH Rocket 🚀",
 	"TMX MEH electricity ⚡","TMX meh SURF 😆","Leave marde 🤣","LEWIS ON TOP BOL 🔥",
-	"TMX MEH BOOK 📚","Pil gya itni jaldi 🤣","Itna lallu fyter🤧","Cvr bye LEWIS👑",
+	"TMX MEH BOOK 📚","Pil gya itni jaldi 🤣","Itna lal1u fyter🤧","Cvr bye LEWIS👑",
 	"Tmx meh petroleum","Dffn?😔","Bhag ja bache😹","Tmx meh dino 😈",
 	"TMX MEH MAJDOOR","TMX MEH SCRIPT","TMX MEH TREE🌴","TMX MEH CLIP",
 	"Tmx Allu🥔","TMX MEH GOAT","TMX MEH BLAZE","TMX MEH SALT",
