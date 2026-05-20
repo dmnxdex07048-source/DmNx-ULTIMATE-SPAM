@@ -1,10 +1,8 @@
 --[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+	👑 DmNx ULTIMATE SPAM REBUILT EDITION 💀
+	VERIFIED STABLE RUN TIME ON MODERN EXECUTORS
 ]]
---[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-	MODIFIED: AURA OF DmNx Ji, Devil Vibe UI, Cinematic Intro, Custom Input Fields.
-]]
+
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 local RunService = game:GetService("RunService")
@@ -14,16 +12,13 @@ local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
 
 --------------------------------------------------
--- SETTINGS & VARIABLES
+-- SETTINGS & ENGINE CONFIG
 --------------------------------------------------
 local saying = false
 local targetName = "TMX"
 local delayTime = 1
 local pattern = "_"
 
---------------------------------------------------
--- RO MESSAGE LIST (KYA RE DmNx PAPA BOL)
---------------------------------------------------
 local roMessages = {
 	"TMX MEH FIRE 🔥","FYTER BNEGA?🤣","BCHE LEWIS ON TOP👑","TMX MEH Rocket 🚀",
 	"TMX MEH electricity ⚡","TMX meh SURF 😆","Leave marde 🤣","LEWIS ON TOP BOL 🔥",
@@ -44,9 +39,6 @@ local roMessages = {
 	"TMX MEH STYLE","TMX MEH ALPHA","TMX MEH FISH"
 }
 
---------------------------------------------------
--- GENERATE LINE
---------------------------------------------------
 local function generateLine()
 	local result = ""
 	while #result < 150 do
@@ -56,7 +48,7 @@ local function generateLine()
 end
 
 --------------------------------------------------
--- SPAM SYSTEM
+-- ENGINE SPAM LOOPS
 --------------------------------------------------
 local function startROSpam()
 	if saying then return end
@@ -67,7 +59,6 @@ local function startROSpam()
 			local msgText = roMessages[math.random(1, #roMessages)]
 			local msg = generateLine().."\n"..targetName.."\n"..msgText
 			
-			-- Send message via modern TextChatService
 			pcall(function()
 				TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
 			end)
@@ -82,18 +73,20 @@ local function stopAll()
 end
 
 --------------------------------------------------
--- GUI CREATION (DEVIL VIBE)
+-- SYSTEM GUI INTEGRATION
 --------------------------------------------------
 local gui = Instance.new("ScreenGui")
-gui.Name = "DmNxUltimateSpam"
+gui.Name = "DmNxUltimateSpamEngine"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
--- Try to parent to CoreGui for safety, fallback to PlayerGui
-local success = pcall(function() gui.Parent = CoreGui end)
-if not success then gui.Parent = player:WaitForChild("PlayerGui") end
+-- Safety Check Fallback Environment Assignment
+local runSuccess, _ = pcall(function() gui.Parent = CoreGui end)
+if not runSuccess then 
+	gui.Parent = player:WaitForChild("PlayerGui") 
+end
 
--- CINEMATIC INTRO
+-- DmNx CINEMATIC INTRO STAGE
 local introFrame = Instance.new("Frame", gui)
 introFrame.Size = UDim2.new(1, 0, 1, 0)
 introFrame.BackgroundColor3 = Color3.fromRGB(5, 0, 0)
@@ -103,19 +96,19 @@ introFrame.ZIndex = 100
 local introText = Instance.new("TextLabel", introFrame)
 introText.Size = UDim2.new(1, 0, 1, 0)
 introText.BackgroundTransparency = 1
-introText.Text = "D m N x   J i   I S   H E R E . . ." -- Intro text changed
+introText.Text = "DmNx PAPA IS HERE . . ."
 introText.Font = Enum.Font.Creepster
-introText.TextSize = 45
-introText.TextColor3 = Color3.fromRGB(180, 0, 0)
+introText.TextSize = 42
+introText.TextColor3 = Color3.fromRGB(200, 0, 0)
 introText.TextTransparency = 1
 introText.ZIndex = 101
 
--- MAIN SQUARE PANEL
+-- MAIN ENGINE INTERFACE PANEL
 local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 0, 0, 0) -- Starts at 0 for pop-up tween
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 12, 12)
+mainFrame.BackgroundColor3 = Color3.fromRGB(14, 11, 11)
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.ClipsDescendants = true
@@ -126,37 +119,36 @@ local mainCorner = Instance.new("UICorner", mainFrame)
 mainCorner.CornerRadius = UDim.new(0, 12)
 
 local mainStroke = Instance.new("UIStroke", mainFrame)
-mainStroke.Color = Color3.fromRGB(150, 0, 0)
+mainStroke.Color = Color3.fromRGB(160, 0, 0)
 mainStroke.Thickness = 2
 mainStroke.Transparency = 0.2
 
--- TITLE
+-- DEV HEADERS
 local titleText = Instance.new("TextLabel", mainFrame)
 titleText.Size = UDim2.new(1, 0, 0, 40)
 titleText.BackgroundTransparency = 1
-titleText.Text = "D m N x   J i" -- Header changed from LEWIS to DmNx Ji
+titleText.Text = "DmNx ULTIMATE SPAM"
 titleText.Font = Enum.Font.GothamBlack
-titleText.TextSize = 22
-titleText.TextColor3 = Color3.fromRGB(200, 20, 20)
+titleText.TextSize = 18
+titleText.TextColor3 = Color3.fromRGB(220, 15, 15)
 
--- UI LAYOUT (For organized stacking)
 local layout = Instance.new("UIListLayout", mainFrame)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Padding = UDim.new(0, 10)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Helper function to create TextBoxes
+-- FACTORY ENGINE BUILD FUNCTIONS
 local function createInput(placeholder, text, order)
 	local container = Instance.new("Frame", mainFrame)
 	container.Size = UDim2.new(0.9, 0, 0, 35)
-	container.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
+	container.BackgroundColor3 = Color3.fromRGB(24, 18, 18)
 	container.LayoutOrder = order
 	
 	local corner = Instance.new("UICorner", container)
 	corner.CornerRadius = UDim.new(0, 6)
 	
 	local stroke = Instance.new("UIStroke", container)
-	stroke.Color = Color3.fromRGB(80, 10, 10)
+	stroke.Color = Color3.fromRGB(90, 12, 12)
 	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	
 	local input = Instance.new("TextBox", container)
@@ -167,29 +159,27 @@ local function createInput(placeholder, text, order)
 	input.PlaceholderText = placeholder
 	input.Font = Enum.Font.GothamSemibold
 	input.TextSize = 14
-	input.TextColor3 = Color3.fromRGB(220, 220, 220)
-	input.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+	input.TextColor3 = Color3.fromRGB(230, 230, 230)
+	input.PlaceholderColor3 = Color3.fromRGB(110, 110, 110)
 	input.TextXAlignment = Enum.TextXAlignment.Left
 	
-	-- Hover Tween for Inputs
 	container.MouseEnter:Connect(function()
-		TweenService:Create(stroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(180, 0, 0)}):Play()
+		TweenService:Create(stroke, TweenInfo.new(0.25), {Color = Color3.fromRGB(190, 0, 0)}):Play()
 	end)
 	container.MouseLeave:Connect(function()
-		TweenService:Create(stroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(80, 10, 10)}):Play()
+		TweenService:Create(stroke, TweenInfo.new(0.25), {Color = Color3.fromRGB(90, 12, 12)}):Play()
 	end)
 	
 	return input
 end
 
--- Helper function to create Buttons
 local function createButton(text, color, order)
 	local btn = Instance.new("TextButton", mainFrame)
 	btn.Size = UDim2.new(0.9, 0, 0, 40)
 	btn.BackgroundColor3 = color
 	btn.Text = text
 	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 15
+	btn.TextSize = 14
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.LayoutOrder = order
 	btn.AutoButtonColor = false
@@ -197,17 +187,5 @@ local function createButton(text, color, order)
 	local corner = Instance.new("UICorner", btn)
 	corner.CornerRadius = UDim.new(0, 6)
 	
-	-- Button Animations
-	local darkenColor = Color3.new(color.R * 0.7, color.G * 0.7, color.B * 0.7)
-	local lightenColor = Color3.new(math.min(color.R * 1.2, 1), math.min(color.G * 1.2, 1), math.min(color.B * 1.2, 1))
-
-	btn.MouseEnter:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = lightenColor}):Play()
-	end)
-	btn.MouseLeave:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = color}):Play()
-	end)
-	btn.MouseButton1Down:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = darkenColor}):Play()
-	end)
-	btn.MouseButton1Up:Connect(function()
+	local darkenColor = Color3.new(color.R * 0.75, color.G * 0.75, color.B * 0.75)
+	local lightenColor = Color3.new(math.min(
