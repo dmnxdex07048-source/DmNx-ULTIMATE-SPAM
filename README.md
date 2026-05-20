@@ -194,21 +194,6 @@ MainTab:CreateButton({
 
 --// FEATURES TAB //--
 
-FeatureTab:CreateToggle({
-    Name = "RGB RP Name",
-    CurrentValue = true,
-    Callback = function(state)
-        RPNameEnabled = state
-
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
-
-        -- REMOVE NAME
-        if not state and remote then
-            remote:FireServer("SetRPName", "")
-        end
-    end,
-})
-
 local FeatureTab = Window:CreateTab("Features", 4483362458)
 
 FeatureTab:CreateButton({
@@ -257,6 +242,21 @@ game:GetService("RunService").Heartbeat:Connect(function()
         end
     end
 end)
+
+FeatureTab:CreateToggle({
+    Name = "RGB RP Name",
+    CurrentValue = true,
+    Callback = function(state)
+        RPNameEnabled = state
+
+        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
+
+        -- REMOVE NAME
+        if not state and remote then
+            remote:FireServer("SetRPName", "")
+        end
+    end,
+})
 
 --// CREDITS TAB //--
 local CreditTab = Window:CreateTab("Credits", 4483362458)
