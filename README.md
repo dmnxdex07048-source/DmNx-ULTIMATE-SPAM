@@ -130,7 +130,6 @@ end)
 
 -- // SPAM ENGINE \\ --
 local function GetNewItem()
-    -- Updated items list per your request
     local Items = {"ICE", "ROCKET", "LAPTOP", "RDP", "CANVAS", "BAG", "COLLEGE", "CVR", "CHOCO", "TOY", "SUN", "BANANA", "PAINT"}
     local chosen = Items[math.random(1, #Items)]
     while chosen == LastItem do chosen = Items[math.random(1, #Items)] end
@@ -168,7 +167,7 @@ end
 
 -- // WINDOW SETUP \\ --
 local Window = Rayfield:CreateWindow({
-   Name = "DmNx Ji v2 | Made For H8 Xudai",
+   Name = "DmNx Ji v2 | Spammer",
    LoadingTitle = "DmNx Ji v2",
    LoadingSubtitle = "By DmNx Ji Papa",
 })
@@ -210,43 +209,4 @@ MainTab:CreateButton({
 local FeatureTab = Window:CreateTab("Features", 4483362458)
 FeatureTab:CreateToggle({Name = "Mod Detector", CurrentValue = true, Callback = function(v) ModDetector = v end})
 FeatureTab:CreateToggle({Name = "Ultra No Sit", Callback = function(v) NoSit = v end})
-FeatureTab:CreateToggle({Name = "Anti-Fling (Kill Attacker)", Callback = function(v) AntiFling = v end})
-FeatureTab:CreateToggle({Name = "Anti-Bang (Kill Attacker)", Callback = function(v) AntiBang = v end})
-
--- Reset Player Button
-FeatureTab:CreateButton({
-    Name = "Reset Player",
-    Callback = function()
-        local char = game.Players.LocalPlayer.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then hum.Health = 0 end
-        end
-    end
-})
-
--- Rejoin Server Button
-FeatureTab:CreateButton({
-    Name = "Rejoin Server",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-    end
-})
-
-FeatureTab:CreateButton({
-    Name = "Reset RP Name",
-    Callback = function()
-        CustomNameActive = false
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
-        if remote then
-            remote:FireServer("SetRPName", "") 
-        end
-        Rayfield:Notify({Title = "Name Reset", Content = "Custom RP Name disabled.", Duration = 3})
-    end
-})
-
-local CreditTab = Window:CreateTab("Credits", 4483362458)
-CreditTab:CreateLabel("DmNx Ji PAPA 👑")
-
--- // EXECUTE \\ --
-StartupMessage()
+FeatureTab:CreateToggle({Name =
