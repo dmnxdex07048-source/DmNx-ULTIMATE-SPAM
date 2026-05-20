@@ -196,6 +196,7 @@ MainTab:CreateButton({
 
 local FeatureTab = Window:CreateTab("Features", 4483362458)
 
+-- RESET CHARACTER
 FeatureTab:CreateButton({
     Name = "Reset Character",
     Callback = function()
@@ -211,6 +212,7 @@ FeatureTab:CreateButton({
     end,
 })
 
+-- REJOIN
 FeatureTab:CreateButton({
     Name = "Rejoin Server",
     Callback = function()
@@ -221,6 +223,7 @@ FeatureTab:CreateButton({
     end,
 })
 
+-- ANTI SIT
 FeatureTab:CreateToggle({
     Name = "Anti Sit",
     CurrentValue = false,
@@ -243,6 +246,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
     end
 end)
 
+-- RGB RP NAME
 FeatureTab:CreateToggle({
     Name = "RGB RP Name",
     CurrentValue = true,
@@ -251,10 +255,207 @@ FeatureTab:CreateToggle({
 
         local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
 
-        -- REMOVE NAME
         if not state and remote then
             remote:FireServer("SetRPName", "")
         end
+    end,
+})
+
+-- WALKSPEED
+FeatureTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 100},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 16,
+    Callback = function(v)
+        local hum = game.Players.LocalPlayer.Character and
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+        if hum then
+            hum.WalkSpeed = v
+        end
+    end,
+})
+
+-- JUMPPOWER
+FeatureTab:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 200},
+    Increment = 5,
+    Suffix = " JP",
+    CurrentValue = 50,
+    Callback = function(v)
+        local hum = game.Players.LocalPlayer.Character and
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+        if hum then
+            hum.JumpPower = v
+        end
+    end,
+})
+
+-- INFINITE JUMP
+getgenv().InfiniteJump = false
+
+FeatureTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Callback = function(v)
+        getgenv().InfiniteJump = v
+    end,
+})
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if getgenv().InfiniteJump then
+        local hum = game.Players.LocalPlayer.Character and
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- NOCLIP
+getgenv().Noclip = false
+
+FeatureTab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Callback = function(v)
+        getgenv().Noclip = v
+    end,
+})
+
+game:GetService("RunService").Stepped:Connect(function()
+    if getgenv().Noclip then
+        local char = game.Players.LocalPlayer.Character
+
+        if char then
+            for _,v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- FULLBRIGHT
+FeatureTab:CreateToggle({
+    Name = "FullBright",
+    CurrentValue = false,
+    Callback = function(v)
+
+        if v then
+            game:GetService("Lighting").Brightness = 5
+            game:GetService("Lighting").ClockTime = 14
+            game:GetService("Lighting").FogEnd = 100000
+            game:GetService("Lighting").GlobalShadows = false
+        else
+            game:GetService("Lighting").Brightness = 2
+            game:GetService("Lighting").GlobalShadows = true
+        end
+    end,
+})
+
+-- FLY
+getgenv().Fly = false
+
+FeatureTab:CreateToggle({
+    Name = "Fly",
+    CurrentValue = false,
+    Callback = function(v)
+        getgenv().Fly = v
+
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        if not char then return end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        if v then
+            local bv = Instance.new("BodyVelocity")
+            bv.Name = "DmNxFly"
+            bv.MaxForce = Vector3.new(999999,999999,999999)
+            bv.Velocity = Vector3.new(0,0,0)
+            bv.Parent = hrp
+
+            task.spawn(function()
+                while getgenv().Fly and hrp do
+                    task.wait()
+                    bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 60
+                end
+
+                if bv then
+                    bv:Destroy()
+                end
+            end)
+        else
+            local fly = hrp:FindFirstChild("DmNxFly")
+            if fly then
+                fly:Destroy()
+            end
+        end
+    end,
+})
+
+-- ANTI AFK
+FeatureTab:CreateButton({
+    Name = "Anti AFK",
+    Callback = function()
+        local vu = game:GetService("VirtualUser")
+
+        game.Players.LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        end)
+
+        Rayfield:Notify({
+            Title = "DmNx ULTIMATE SPAM",
+            Content = "Anti AFK Enabled",
+            Duration = 3,
+        })
+    end,
+})
+
+-- FPS BOOST
+FeatureTab:CreateButton({
+    Name = "FPS Boost",
+    Callback = function()
+        for _,v in pairs(game:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.Reflectance = 0
+            end
+        end
+
+        game:GetService("Lighting").GlobalShadows = false
+
+        Rayfield:Notify({
+            Title = "DmNx ULTIMATE SPAM",
+            Content = "FPS Boost Enabled",
+            Duration = 3,
+        })
+    end,
+})
+
+-- COPY DISCORD
+FeatureTab:CreateButton({
+    Name = "Copy Discord Invite",
+    Callback = function()
+        if setclipboard then
+            setclipboard("https://discord.gg/dwZHZBVje")
+        end
+
+        Rayfield:Notify({
+            Title = "DmNx",
+            Content = "Discord Link Copied",
+            Duration = 3,
+        })
     end,
 })
 
