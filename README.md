@@ -85,7 +85,7 @@ end
 -- GUI CREATION (DEVIL VIBE)
 --------------------------------------------------
 local gui = Instance.new("ScreenGui")
-gui.Name = "DevilLewis"
+gui.Name = "DmNxUltimateSpam"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
@@ -103,7 +103,7 @@ introFrame.ZIndex = 100
 local introText = Instance.new("TextLabel", introFrame)
 introText.Size = UDim2.new(1, 0, 1, 0)
 introText.BackgroundTransparency = 1
-introText.Text = "L E W I S   I S   H E R E . . ."
+introText.Text = "D m N x   J i   I S   H E R E . . ." -- Intro text changed
 introText.Font = Enum.Font.Creepster
 introText.TextSize = 45
 introText.TextColor3 = Color3.fromRGB(180, 0, 0)
@@ -134,7 +134,7 @@ mainStroke.Transparency = 0.2
 local titleText = Instance.new("TextLabel", mainFrame)
 titleText.Size = UDim2.new(1, 0, 0, 40)
 titleText.BackgroundTransparency = 1
-titleText.Text = "L E W I S"
+titleText.Text = "D m N x   J i" -- Header changed from LEWIS to DmNx Ji
 titleText.Font = Enum.Font.GothamBlack
 titleText.TextSize = 22
 titleText.TextColor3 = Color3.fromRGB(200, 20, 20)
@@ -211,101 +211,3 @@ local function createButton(text, color, order)
 		TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = darkenColor}):Play()
 	end)
 	btn.MouseButton1Up:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.1), {BackgroundColor3 = lightenColor}):Play()
-	end)
-	
-	return btn
-end
-
--- Create the empty title spacer for UIListLayout
-local titleSpacer = Instance.new("Frame", mainFrame)
-titleSpacer.Size = UDim2.new(1, 0, 0, 30)
-titleSpacer.BackgroundTransparency = 1
-titleSpacer.LayoutOrder = 0
-
--- Inputs
-local targetInput = createInput("Target Name (e.g. TMX)", targetName, 1)
-local delayInput = createInput("Delay (e.g. 1)", tostring(delayTime), 2)
-local patternInput = createInput("Pattern (e.g. _)", pattern, 3)
-
--- Buttons
-local startBtn = createButton("START SPAM", Color3.fromRGB(120, 10, 10), 4)
-local stopBtn = createButton("STOP", Color3.fromRGB(40, 40, 40), 5)
-
--- TOGGLE BUTTON (Small Devil Icon)
-local toggleBtn = Instance.new("TextButton", gui)
-toggleBtn.Size = UDim2.new(0, 45, 0, 45)
-toggleBtn.Position = UDim2.new(0, 20, 0.5, -22)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(15, 12, 12)
-toggleBtn.Text = "😈"
-toggleBtn.TextSize = 25
-toggleBtn.BorderSizePixel = 0
-toggleBtn.Visible = false
-toggleBtn.Draggable = true
-
-local toggleCorner = Instance.new("UICorner", toggleBtn)
-toggleCorner.CornerRadius = UDim.new(0, 8)
-local toggleStroke = Instance.new("UIStroke", toggleBtn)
-toggleStroke.Color = Color3.fromRGB(150, 0, 0)
-toggleStroke.Thickness = 2
-
---------------------------------------------------
--- FUNCTIONALITY BINDINGS
---------------------------------------------------
-
--- Update variables when inputs change
-targetInput.FocusLost:Connect(function()
-	if targetInput.Text ~= "" then targetName = targetInput.Text end
-end)
-
-delayInput.FocusLost:Connect(function()
-	local num = tonumber(delayInput.Text)
-	if num then delayTime = num else delayInput.Text = tostring(delayTime) end
-end)
-
-patternInput.FocusLost:Connect(function()
-	if patternInput.Text ~= "" then pattern = patternInput.Text end
-end)
-
-startBtn.MouseButton1Click:Connect(startROSpam)
-stopBtn.MouseButton1Click:Connect(stopAll)
-
--- Toggle Menu Tween
-local menuOpen = true
-toggleBtn.MouseButton1Click:Connect(function()
-	menuOpen = not menuOpen
-	if menuOpen then
-		mainFrame.Visible = true
-		TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 280, 0, 290)}):Play()
-	else
-		local closeTween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
-		closeTween:Play()
-		closeTween.Completed:Wait()
-		mainFrame.Visible = false
-	end
-end)
-
---------------------------------------------------
--- PLAY CINEMATIC INTRO
---------------------------------------------------
-task.spawn(function()
-	-- Text fade in
-	local tweenIn = TweenService:Create(introText, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {TextTransparency = 0})
-	tweenIn:Play()
-	tweenIn.Completed:Wait()
-	
-	task.wait(1.5) -- Hold for effect
-	
-	-- Text & Background fade out
-	TweenService:Create(introText, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
-	local bgOut = TweenService:Create(introFrame, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {BackgroundTransparency = 1})
-	bgOut:Play()
-	bgOut.Completed:Wait()
-	
-	introFrame:Destroy() -- Cleanup
-	
-	-- Reveal UI
-	toggleBtn.Visible = true
-	mainFrame.Visible = true
-	TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Size = UDim2.new(0, 280, 0, 290)}):Play()
-end)
