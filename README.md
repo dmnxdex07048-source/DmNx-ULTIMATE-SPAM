@@ -1,295 +1,206 @@
 --[[
 	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
 ]]
---[[
-WARNING: Heads up! This script has not been verified by ScriptBlox.
-Use at your own risk!
-
-SAM V1 CLEAN  
-Spam Engine + Tool Loader
-
-]]
-
----------------- SERVICES ----------------
+-- Services
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
 
-local lp = Players.LocalPlayer
+-- State
+local running = false
+local interval = 1.1 
+local currentMode = "ALL"
+local glowStrokes = {}
 
----------------- STATE ----------------
-local active = false
-local index = 1
-local patternIndex = 1
-local waitTime = 0
-local iyLoaded = false
-local mikeyLoaded = false
-local gazeLoaded = false
-local redzLoaded = false
+-- UI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ZxzSpamV1_GlowEdition"
+screenGui.IgnoreGuiInset = true 
+screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 999999 
 
----------------- PHRASES ----------------
-local phrases = {
-"leave marde","TMKX FAN","TMKX telephone","Tmkx Tablet",
-"Tmkx keyboard","Tmkx guitar","Tmkx brookhaven",
-"Tmkx mera lun","SAM DADA BOL"
-}
+local success, err = pcall(function() screenGui.Parent = CoreGui end)
+if not success then screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui") end
 
----------------- UI CLEANUP ----------------
-pcall(function()
-if game.CoreGui:FindFirstChild("SAM_V1") then
-game.CoreGui.SAM_V1:Destroy()
-end
-end)
-
----------------- UI ----------------
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "SAM_V1"
-gui.ResetOnSpawn = false
-
--- FLOAT TOGGLE
-local toggleBtn = Instance.new("TextButton", gui)
-toggleBtn.Size = UDim2.fromScale(0.12, 0.05)
-toggleBtn.Position = UDim2.fromScale(0.44, 0.02)
-toggleBtn.Text = "SAM UI"
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
-toggleBtn.TextColor3 = Color3.new(1,1,1)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextScaled = true
-toggleBtn.BorderSizePixel = 0
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0,12)
-
--- MAIN FRAME
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.fromScale(0.36, 0.7)
-frame.Position = UDim2.fromScale(0.32, 0.15)
-frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0,16)
-
--- HEADER
-local header = Instance.new("TextLabel", frame)
-header.Size = UDim2.fromScale(1, 0.1)
-header.Text = "SAM V1"
-header.BackgroundTransparency = 1
-header.TextColor3 = Color3.fromRGB(255,255,255)
-header.Font = Enum.Font.GothamBold
-header.TextScaled = true
-
----------------- UI HELPERS ----------------
-local function makeBtn(text, x, y, sx)
-local b = Instance.new("TextButton", frame)
-b.Size = UDim2.fromScale(sx or 0.42, 0.08)
-b.Position = UDim2.fromScale(x, y)
-b.Text = text
-b.BackgroundColor3 = Color3.fromRGB(0,0,0)
-b.TextColor3 = Color3.new(1,1,1)
-b.Font = Enum.Font.GothamBold
-b.TextScaled = true
-b.BorderSizePixel = 0
-Instance.new("UICorner", b).CornerRadius = UDim.new(0,12)
-return b
+-- Helper for Glowing Style
+local function applyGlowStyle(obj, radius, thickness)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius or 10)
+    corner.Parent = obj
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = thickness or 2.5
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Parent = obj
+    
+    table.insert(glowStrokes, stroke)
+    return stroke
 end
 
-local function makeBox(placeholder, x, y)
-local t = Instance.new("TextBox", frame)
-t.Size = UDim2.fromScale(0.9, 0.08)
-t.Position = UDim2.fromScale(x, y)
-t.PlaceholderText = placeholder
-t.Text = ""
-t.BackgroundColor3 = Color3.fromRGB(0,0,0)
-t.TextColor3 = Color3.new(1,1,1)
-t.Font = Enum.Font.Gotham
-t.TextScaled = true
-t.BorderSizePixel = 0
-Instance.new("UICorner", t).CornerRadius = UDim.new(0,10)
-return t
+-- Main Frame
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 380, 0, 260) -- Adjusted width for 6 buttons
+main.Position = UDim2.new(0.5, -190, 0.4, -130)
+main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+main.Active = true
+main.Draggable = true
+main.Parent = screenGui
+applyGlowStyle(main, 12, 2)
+
+-- Ninja Icon
+local icon = Instance.new("ImageLabel")
+icon.Size = UDim2.new(0, 60, 0, 60)
+icon.Position = UDim2.new(0.5, -30, 0, -30)
+icon.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+icon.Image = "rbxassetid://10821590453"
+icon.Parent = main
+applyGlowStyle(icon, 12, 2.5)
+
+-- Banner Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 10)
+title.BackgroundTransparency = 1
+title.Text = "DmNx SPAM V1 🔥"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 24
+title.Font = Enum.Font.GothamBold
+title.Parent = main
+
+-- Target Input
+local targetInput = Instance.new("TextBox")
+targetInput.Size = UDim2.new(0.9, 0, 0, 45)
+targetInput.Position = UDim2.new(0.05, 0, 0.25, 0)
+targetInput.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+targetInput.PlaceholderText = "Target Name Here..."
+targetInput.Text = ""
+targetInput.TextColor3 = Color3.new(1, 1, 1)
+targetInput.Font = Enum.Font.GothamBold
+targetInput.Parent = main
+applyGlowStyle(targetInput, 8, 1.5)
+
+-- Mode Selection Frame
+local modeFrame = Instance.new("Frame")
+modeFrame.Size = UDim2.new(0.96, 0, 0, 45)
+modeFrame.Position = UDim2.new(0.02, 0, 0.46, 0)
+modeFrame.BackgroundTransparency = 1
+modeFrame.Parent = main
+
+local function createGlowBtn(text, mode, xPos)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.15, 0, 0.9, 0) -- Adjusted width for 6 buttons
+    btn.Position = UDim2.new(xPos, 0, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextScaled = true
+    btn.Parent = modeFrame
+    applyGlowStyle(btn, 6, 2.5)
+
+    btn.MouseButton1Click:Connect(function()
+        currentMode = mode
+        for _, v in pairs(modeFrame:GetChildren()) do
+            if v:IsA("TextButton") then v.BackgroundColor3 = Color3.fromRGB(30, 30, 30) end
+        end
+        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    end)
+    return btn
 end
 
----------------- SPAM UI ----------------
-local input = makeBox("enter target name", 0.05, 0.15)
+-- Layout for 6 Buttons
+createGlowBtn("^~^", "UP", 0)
+createGlowBtn("(ㄒ爪Ҝ乂)", "MAGI", 0.16)
+createGlowBtn("#", "ANGEL", 0.32)
+createGlowBtn("@", "AT", 0.48)
+createGlowBtn("@_@", "AT_UNDERSCORE", 0.64)
+createGlowBtn("ALL", "ALL", 0.82).BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 
-local startBtn = makeBtn("START", 0.05, 0.26)
-local stopBtn  = makeBtn("STOP",  0.53, 0.26)
+-- Main Toggle
+local toggleSpam = Instance.new("TextButton")
+toggleSpam.Size = UDim2.new(0.9, 0, 0, 50)
+toggleSpam.Position = UDim2.new(0.05, 0, 0.75, 0)
+toggleSpam.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+toggleSpam.Text = "START SPAMMING"
+toggleSpam.TextColor3 = Color3.new(1, 1, 1)
+toggleSpam.Font = Enum.Font.GothamBold
+toggleSpam.TextSize = 20
+toggleSpam.Parent = main
+applyGlowStyle(toggleSpam, 10, 2)
 
----------------- DELAY ----------------
-local delayLabel = Instance.new("TextLabel", frame)
-delayLabel.Size = UDim2.fromScale(0.4, 0.06)
-delayLabel.Position = UDim2.fromScale(0.05, 0.36)
-delayLabel.Text = "Delay: 0"
-delayLabel.BackgroundTransparency = 1
-delayLabel.TextColor3 = Color3.new(1,1,1)
-delayLabel.Font = Enum.Font.GothamBold
-delayLabel.TextScaled = true
+-- AE Toggle Button
+local aeBtn = Instance.new("TextButton")
+aeBtn.Size = UDim2.new(0, 55, 0, 55)
+aeBtn.Position = UDim2.new(0, 15, 0.5, -27)
+aeBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+aeBtn.Text = "AE"
+aeBtn.TextColor3 = Color3.new(1, 1, 1)
+aeBtn.Font = Enum.Font.GothamBold
+aeBtn.Parent = screenGui
+applyGlowStyle(aeBtn, 15, 4)
 
-local plusBtn  = makeBtn("+", 0.48, 0.36, 0.18)
-local minusBtn = makeBtn("-", 0.72, 0.36, 0.18)
+aeBtn.MouseButton1Click:Connect(function() main.Visible = not main.Visible end)
 
-local function updateDelayUI()
-delayLabel.Text = "Delay: "..string.format("%.1f",waitTime)..""
-end
-
-plusBtn.MouseButton1Click:Connect(function()
-waitTime = math.clamp(waitTime + 0.1, 0, 3)
-updateDelayUI()
-end)
-
-minusBtn.MouseButton1Click:Connect(function()
-waitTime = math.clamp(waitTime - 0.1, 0, 3)
-updateDelayUI()
-end)
-
----------------- STATUS ----------------
-local status = Instance.new("TextLabel", frame)
-status.Size = UDim2.fromScale(0.9, 0.06)
-status.Position = UDim2.fromScale(0.05, 0.45)
-status.Text = "Status: WAITING"
-status.BackgroundTransparency = 1
-status.TextColor3 = Color3.fromRGB(255,80,80)
-status.Font = Enum.Font.GothamBold
-status.TextScaled = true
-
----------------- TOOLS ----------------
-local iyBtn    = makeBtn("CORE HUB", 0.05, 0.55)
-local mikeyBtn = makeBtn("AUDIO PLAYER", 0.53, 0.55)
-local gazeBtn  = makeBtn("EMOTE SYSTEM", 0.29, 0.65)
-local redzBtn  = makeBtn("GAME HUB", 0.29, 0.75)
-
----------------- CHAT SEND ----------------
-local function send(msg, pattern)
-if not msg or msg == "" then return end
-
-local final = msg  
-if pattern then  
-    local p = {"%","_","0"}  
-    local s = p[patternIndex]  
-    final = string.rep(s, math.floor(170/#s)) .. " " .. msg  
-    patternIndex = patternIndex % #p + 1  
-end  
-
-pcall(function()  
-    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then  
-        TextChatService.TextChannels.RBXGeneral:SendAsync(final)  
-    else  
-        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(final, "All")  
-    end  
-end)
-
-end
-
----------------- SPAM LOOP ----------------
+-- Rainbow & Pulsing Animation
 task.spawn(function()
-while true do
-if active then
-send(input.Text.." "..phrases[index], true)
-index = index % #phrases + 1
-task.wait(waitTime)
-end
-task.wait(0.05)
-end
+    local h = 0
+    while true do
+        h = h + 0.01
+        local color = Color3.fromHSV(h % 1, 0.8, 1)
+        local transparency = 0.2 + (math.sin(tick() * 5) * 0.3)
+        for _, stroke in pairs(glowStrokes) do
+            stroke.Color = color
+            stroke.Transparency = transparency
+        end
+        task.wait(0.03)
+    end
 end)
 
-startBtn.MouseButton1Click:Connect(function()
-active = true
-status.Text = "Status: ACTIVE"
-status.TextColor3 = Color3.fromRGB(80,255,120)
-end)
-
-stopBtn.MouseButton1Click:Connect(function()
-active = false
-status.Text = "Status: STOPPED"
-status.TextColor3 = Color3.fromRGB(255,80,80)
-end)
-
----------------- INFINITE YIELD ----------------
-iyBtn.MouseButton1Click:Connect(function()
-if iyLoaded then
-iyBtn.Text = "HUB LOADED ✅"
-return
+-- Chat Function
+local function sendChat(msg)
+    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+        local channel = TextChatService.TextChannels.RBXGeneral
+        if channel then channel:SendAsync(msg) end
+    else
+        local remote = ReplicatedStorage:FindFirstChild("SayMessageRequest", true)
+        if remote then remote:FireServer(msg, "All") end
+    end
 end
 
-iyLoaded = true  
-iyBtn.Text = "LOADING..."  
-
-task.spawn(function()  
-    pcall(function()  
-        loadstring(game:HttpGet(  
-            "https://raw.githubusercontent.com/4Peek/Fractal/refs/heads/main/iy_modded.lua"  
-        ))()  
-    end)  
-    iyBtn.Text = "HUB LOADED ✅"  
+-- Spam Logic
+toggleSpam.MouseButton1Click:Connect(function()
+    running = not running
+    if running then
+        toggleSpam.Text = "STOP SPAMMING"
+        toggleSpam.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+        task.spawn(function()
+            local index = 1
+            while running do
+                local target = targetInput.Text ~= "" and targetInput.Text or "Player"
+                local msgs = {
+                    UP = "(^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^^~^ (" .. target .. ") ㄒ爪Ҝ乂 爪乇丨ㄖᐯ乇几 😒)",
+                     = "(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂) 🔥 (" .. target .. ")",
+                    乃Ҝㄥ = "################################################################################################################################### (" .. target .. ") H8TERS XUDA😛🔥",
+                    AT = "(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂)(ㄒ爪Ҝ乂) (" .. target .. ") ㄒ爪Ҝ乂 爪乇丨 千卂几 🗿",
+                    AT_UNDERSCORE = "@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@@_@   (" .. ㄒ爪Ҝ乂 爪乇丨 乃卄ㄖﾌ卩ㄩ尺丨( target .. ")"
+                }
+                local list = {msgs.UP, msgs.ㄒ爪Ҝ乂, msgs.乃Ҝㄥ, msgs.AT, msgs.AT_UNDERSCORE}
+                local toSend = (currentMode == "ALL") and list[index] or msgs[currentMode]
+                if currentMode == "ALL" then index = (index % #list) + 1 end
+                pcall(function() sendChat(toSend) end)
+                task.wait(interval)
+            end
+        end)
+    else
+        toggleSpam.Text = "START SPAMMING"
+        toggleSpam.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+    end
 end)
 
+-- Brookhaven Announcement on Load
+task.spawn(function()
+    task.wait(0.5)
+    sendChat("—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—_—·–—__—— Khel Khatam Beta DmNx v1 Loaded 🔥🌪️")
 end)
-
----------------- AUDIO PLAYER ----------------
-mikeyBtn.MouseButton1Click:Connect(function()
-if mikeyLoaded then
-mikeyBtn.Text = "AUDIO LOADED ✅"
-return
-end
-
-mikeyLoaded = true  
-mikeyBtn.Text = "LOADING..."  
-
-task.spawn(function()  
-    pcall(function()  
-        loadstring(game:HttpGet(  
-            "https://raw.githubusercontent.com/Gaurav-0196/Mickey-Aud/refs/heads/main/MickeyMusic"  
-        ))()  
-    end)  
-    mikeyBtn.Text = "AUDIO LOADED ✅"  
-end)
-
-end)
-
----------------- EMOTE SYSTEM ----------------
-gazeBtn.MouseButton1Click:Connect(function()
-if gazeLoaded then
-gazeBtn.Text = "EMOTES LOADED ✅"
-return
-end
-
-gazeLoaded = true  
-gazeBtn.Text = "LOADING..."  
-
-task.spawn(function()  
-    pcall(function()  
-        loadstring(game:HttpGet(  
-            "https://raw.githubusercontent.com/Gazer-Ha/Gaze-stuff/refs/heads/main/Gaze%20emote"  
-        ))()  
-    end)  
-    gazeBtn.Text = "EMOTES LOADED ✅"  
-end)
-
-end)
-
----------------- GAME HUB ----------------
-redzBtn.MouseButton1Click:Connect(function()
-if redzLoaded then
-redzBtn.Text = "GAME HUB LOADED ✅"
-return
-end
-
-redzLoaded = true  
-redzBtn.Text = "LOADING..."  
-
-task.spawn(function()  
-    pcall(function()  
-        loadstring(game:HttpGet(  
-            "https://rawscripts.net/raw/Brookhaven-RP-Brookhaven-Redz-Hub-Cracked-77478"  
-        ))()  
-    end)  
-    redzBtn.Text = "GAME HUB LOADED ✅"  
-end)
-
-end)
-
----------------- TOGGLE ----------------
-toggleBtn.MouseButton1Click:Connect(function()
-frame.Visible = not frame.Visible
-end)
-
-updateDelayUI()
-print("✅ SAM V1 LOADED — CORE HUB + AUDIO + EMOTES ACTIVE")
