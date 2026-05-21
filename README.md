@@ -13,19 +13,6 @@ local IsSpamming = false
 local LastItem = ""
 local ChatCounter = 0
 
--- CUSTOM RP NAME INPUT
-MainTab:CreateInput({
-    Name = "Custom RP Name",
-    PlaceholderText = "Enter RP Name",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text)
-
-        if text and text ~= "" then
-            CustomName = text
-        end
-    end,
-})
-
 --// ITEMS //--
 local Items = {
     "ㄒ爪Ҝ乂 ME ICE",
