@@ -1,317 +1,295 @@
--- // LOAD RAYFIELD IMMEDIATELY \\ --
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--[[
+WARNING: Heads up! This script has not been verified by ScriptBlox.
+Use at your own risk!
 
--- // SETTINGS & STATE \\ --
-local TargetName = "Enemy"
-local SelectedSymbol = "@"
-local SpamDelay = 2.0 
-local IsSpamming = false
-local CustomNameActive = true
-local LastItem = ""
-local ChatCounter = 0
+SAM V1 CLEAN  
+Spam Engine + Tool Loader
 
-local AntiAFK, AntiFling, AntiBang, NoSit, ModDetector = false, false, false, false, true
+]]
 
--- // RP NAME STYLE \\ --
-local RP_NAME = "🚨💢 DmNx Ji USER 💢🚨"
+---------------- SERVICES ----------------
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
 
--- // INITIAL EXECUTION MESSAGE \\ --
-local function StartupMessage()
-    local msg = "🚨 BEWARE ! DmNx Ji USER DETECTED 🚨 !!"
-    local ChatEvent = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
-    if ChatEvent then
-        ChatEvent.SayMessageRequest:FireServer(msg, "All")
-    else
-        local channel = game:GetService("TextChatService"):FindFirstChild("TextChannels") and game:GetService("TextChatService").TextChannels:FindFirstChild("RBXGeneral")
-        if channel then
-            channel:SendAsync(msg)
-        end
-    end
+local lp = Players.LocalPlayer
+
+---------------- STATE ----------------
+local active = false
+local index = 1
+local patternIndex = 1
+local waitTime = 0
+local iyLoaded = false
+local mikeyLoaded = false
+local gazeLoaded = false
+local redzLoaded = false
+
+---------------- PHRASES ----------------
+local phrases = {
+"leave marde","TMKX FAN","TMKX telephone","Tmkx Tablet",
+"Tmkx keyboard","Tmkx guitar","Tmkx brookhaven",
+"Tmkx mera lun","SAM DADA BOL"
+}
+
+---------------- UI CLEANUP ----------------
+pcall(function()
+if game.CoreGui:FindFirstChild("SAM_V1") then
+game.CoreGui.SAM_V1:Destroy()
+end
+end)
+
+---------------- UI ----------------
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "SAM_V1"
+gui.ResetOnSpawn = false
+
+-- FLOAT TOGGLE
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.fromScale(0.12, 0.05)
+toggleBtn.Position = UDim2.fromScale(0.44, 0.02)
+toggleBtn.Text = "SAM UI"
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextScaled = true
+toggleBtn.BorderSizePixel = 0
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0,12)
+
+-- MAIN FRAME
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.fromScale(0.36, 0.7)
+frame.Position = UDim2.fromScale(0.32, 0.15)
+frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,16)
+
+-- HEADER
+local header = Instance.new("TextLabel", frame)
+header.Size = UDim2.fromScale(1, 0.1)
+header.Text = "SAM V1"
+header.BackgroundTransparency = 1
+header.TextColor3 = Color3.fromRGB(255,255,255)
+header.Font = Enum.Font.GothamBold
+header.TextScaled = true
+
+---------------- UI HELPERS ----------------
+local function makeBtn(text, x, y, sx)
+local b = Instance.new("TextButton", frame)
+b.Size = UDim2.fromScale(sx or 0.42, 0.08)
+b.Position = UDim2.fromScale(x, y)
+b.Text = text
+b.BackgroundColor3 = Color3.fromRGB(0,0,0)
+b.TextColor3 = Color3.new(1,1,1)
+b.Font = Enum.Font.GothamBold
+b.TextScaled = true
+b.BorderSizePixel = 0
+Instance.new("UICorner", b).CornerRadius = UDim.new(0,12)
+return b
 end
 
--- // MOD WARNING UI \\ --
-local function ShowModWarning(name)
-    local sg = Instance.new("ScreenGui", game.CoreGui)
-    local frame = Instance.new("Frame", sg)
-
-    frame.Size = UDim2.new(1, 0, 0.3, 0)
-    frame.Position = UDim2.new(0, 0, 0.35, 0)
-    frame.BackgroundColor3 = Color3.new(0.5, 0, 0)
-    frame.BackgroundTransparency = 0.3
-
-    local txt = Instance.new("TextLabel", frame)
-    txt.Size = UDim2.new(1, 0, 1, 0)
-    txt.Text = "⚠️ MODERATOR JOINED: " .. name:upper() .. " ⚠️"
-    txt.TextColor3 = Color3.new(1, 1, 1)
-    txt.TextScaled = true
-    txt.Font = Enum.Font.SourceSansBold
-
-    task.delay(5, function()
-        sg:Destroy()
-    end)
+local function makeBox(placeholder, x, y)
+local t = Instance.new("TextBox", frame)
+t.Size = UDim2.fromScale(0.9, 0.08)
+t.Position = UDim2.fromScale(x, y)
+t.PlaceholderText = placeholder
+t.Text = ""
+t.BackgroundColor3 = Color3.fromRGB(0,0,0)
+t.TextColor3 = Color3.new(1,1,1)
+t.Font = Enum.Font.Gotham
+t.TextScaled = true
+t.BorderSizePixel = 0
+Instance.new("UICorner", t).CornerRadius = UDim.new(0,10)
+return t
 end
 
--- // RGB NAME & BROOKHAVEN SYNC \\ --
+---------------- SPAM UI ----------------
+local input = makeBox("enter target name", 0.05, 0.15)
+
+local startBtn = makeBtn("START", 0.05, 0.26)
+local stopBtn  = makeBtn("STOP",  0.53, 0.26)
+
+---------------- DELAY ----------------
+local delayLabel = Instance.new("TextLabel", frame)
+delayLabel.Size = UDim2.fromScale(0.4, 0.06)
+delayLabel.Position = UDim2.fromScale(0.05, 0.36)
+delayLabel.Text = "Delay: 0"
+delayLabel.BackgroundTransparency = 1
+delayLabel.TextColor3 = Color3.new(1,1,1)
+delayLabel.Font = Enum.Font.GothamBold
+delayLabel.TextScaled = true
+
+local plusBtn  = makeBtn("+", 0.48, 0.36, 0.18)
+local minusBtn = makeBtn("-", 0.72, 0.36, 0.18)
+
+local function updateDelayUI()
+delayLabel.Text = "Delay: "..string.format("%.1f",waitTime)..""
+end
+
+plusBtn.MouseButton1Click:Connect(function()
+waitTime = math.clamp(waitTime + 0.1, 0, 3)
+updateDelayUI()
+end)
+
+minusBtn.MouseButton1Click:Connect(function()
+waitTime = math.clamp(waitTime - 0.1, 0, 3)
+updateDelayUI()
+end)
+
+---------------- STATUS ----------------
+local status = Instance.new("TextLabel", frame)
+status.Size = UDim2.fromScale(0.9, 0.06)
+status.Position = UDim2.fromScale(0.05, 0.45)
+status.Text = "Status: WAITING"
+status.BackgroundTransparency = 1
+status.TextColor3 = Color3.fromRGB(255,80,80)
+status.Font = Enum.Font.GothamBold
+status.TextScaled = true
+
+---------------- TOOLS ----------------
+local iyBtn    = makeBtn("CORE HUB", 0.05, 0.55)
+local mikeyBtn = makeBtn("AUDIO PLAYER", 0.53, 0.55)
+local gazeBtn  = makeBtn("EMOTE SYSTEM", 0.29, 0.65)
+local redzBtn  = makeBtn("GAME HUB", 0.29, 0.75)
+
+---------------- CHAT SEND ----------------
+local function send(msg, pattern)
+if not msg or msg == "" then return end
+
+local final = msg  
+if pattern then  
+    local p = {"%","_","0"}  
+    local s = p[patternIndex]  
+    final = string.rep(s, math.floor(170/#s)) .. " " .. msg  
+    patternIndex = patternIndex % #p + 1  
+end  
+
+pcall(function()  
+    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then  
+        TextChatService.TextChannels.RBXGeneral:SendAsync(final)  
+    else  
+        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(final, "All")  
+    end  
+end)
+
+end
+
+---------------- SPAM LOOP ----------------
 task.spawn(function()
-    while task.wait(0.1) do
-        if not CustomNameActive then
-            break
-        end
-
-        pcall(function()
-            local char = game.Players.LocalPlayer.Character
-
-            if char then
-                local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
-
-                if remote then
-                    remote:FireServer("SetRPName", RP_NAME)
-                end
-
-                local head = char:FindFirstChild("Head")
-
-                if head then
-                    for _, v in pairs(head:GetChildren()) do
-                        if v:IsA("BillboardGui") then
-                            local label = v:FindFirstChildOfClass("TextLabel")
-
-                            if label then
-                                label.Text = RP_NAME
-                                label.Font = Enum.Font.RobotoMono
-                                label.TextColor3 = Color3.fromHSV(tick() % 3 / 3, 1, 1)
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end
+while true do
+if active then
+send(input.Text.." "..phrases[index], true)
+index = index % #phrases + 1
+task.wait(waitTime)
+end
+task.wait(0.05)
+end
 end)
 
--- // SMOOTH PHYSICS & ULTRA NO SIT \\ --
-game:GetService("RunService").Heartbeat:Connect(function()
-    local char = game.Players.LocalPlayer.Character
-
-    if char then
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local hum = char:FindFirstChildOfClass("Humanoid")
-
-        if hum and NoSit then
-            hum.Sit = false
-
-            if hum:GetState() == Enum.HumanoidStateType.Seated then
-                hum:ChangeState(Enum.HumanoidStateType.Running)
-            end
-        end
-    end
+startBtn.MouseButton1Click:Connect(function()
+active = true
+status.Text = "Status: ACTIVE"
+status.TextColor3 = Color3.fromRGB(80,255,120)
 end)
 
--- // MOD DETECTOR \\ --
-game.Players.PlayerAdded:Connect(function(player)
-    if ModDetector then
-        if player:GetRankInGroup(4353493) >= 10 or player.UserId == 23204300 then
-            IsSpamming = false
-            ShowModWarning(player.Name)
-        end
-    end
+stopBtn.MouseButton1Click:Connect(function()
+active = false
+status.Text = "Status: STOPPED"
+status.TextColor3 = Color3.fromRGB(255,80,80)
 end)
 
--- // SPAM ENGINE \\ --
-local function GetNewItem()
-    local Items = {
-        "ICE",
-        "ROCKET",
-        "LAPTOP",
-        "RDP",
-        "CANVAS",
-        "BAG",
-        "COLLEGE",
-        "CVR",
-        "CHOCO",
-        "TOY",
-        "SUN",
-        "BANANA",
-        "PAINT"
-    }
-
-    local chosen = Items[math.random(1, #Items)]
-
-    while chosen == LastItem do
-        chosen = Items[math.random(1, #Items)]
-    end
-
-    LastItem = chosen
-    return chosen
+---------------- INFINITE YIELD ----------------
+iyBtn.MouseButton1Click:Connect(function()
+if iyLoaded then
+iyBtn.Text = "HUB LOADED ✅"
+return
 end
 
-local function SendSpam()
-    task.spawn(function()
-        while IsSpamming do
-            ChatCounter = ChatCounter + 1
+iyLoaded = true  
+iyBtn.Text = "LOADING..."  
 
-            local Message = ""
-            local Noise = " " .. string.char(math.random(200, 250))
+task.spawn(function()  
+    pcall(function()  
+        loadstring(game:HttpGet(  
+            "https://raw.githubusercontent.com/4Peek/Fractal/refs/heads/main/iy_modded.lua"  
+        ))()  
+    end)  
+    iyBtn.Text = "HUB LOADED ✅"  
+end)
 
-            if ChatCounter >= 7 then
-                Message = "👑 MADE BY DmNx Ji 👑" .. Noise
-                ChatCounter = 0
-            else
-                local Item = GetNewItem()
-                local SL = string.rep(SelectedSymbol, 35)
+end)
 
-                Message =
-                    SL ..
-                    "\n" ..
-                    SL ..
-                    "\n" ..
-                    SL ..
-                    "\n(" ..
-                    TargetName:upper() ..
-                    ") TMX MEH " ..
-                    Item ..
-                    Noise
-            end
-
-            local ChatEvent =
-                game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
-
-            if ChatEvent then
-                ChatEvent.SayMessageRequest:FireServer(Message, "All")
-            else
-                local channel =
-                    game:GetService("TextChatService"):FindFirstChild("TextChannels") and
-                    game:GetService("TextChatService").TextChannels:FindFirstChild("RBXGeneral")
-
-                if channel then
-                    channel:SendAsync(Message)
-                end
-            end
-
-            task.wait(SpamDelay)
-        end
-    end)
+---------------- AUDIO PLAYER ----------------
+mikeyBtn.MouseButton1Click:Connect(function()
+if mikeyLoaded then
+mikeyBtn.Text = "AUDIO LOADED ✅"
+return
 end
 
--- // WINDOW SETUP \\ --
-local Window = Rayfield:CreateWindow({
-    Name = "DmNx Ji | Made For H8 Xudai",
-    LoadingTitle = "DmNx Ji",
-    LoadingSubtitle = "By DmNx Ji",
-})
+mikeyLoaded = true  
+mikeyBtn.Text = "LOADING..."  
 
-local MainTab = Window:CreateTab("Spammer", 4483362458)
+task.spawn(function()  
+    pcall(function()  
+        loadstring(game:HttpGet(  
+            "https://raw.githubusercontent.com/Gaurav-0196/Mickey-Aud/refs/heads/main/MickeyMusic"  
+        ))()  
+    end)  
+    mikeyBtn.Text = "AUDIO LOADED ✅"  
+end)
 
-MainTab:CreateInput({
-    Name = "Target Name",
-    PlaceholderText = "Enter Name",
-    Callback = function(t)
-        TargetName = t
-    end,
-})
+end)
 
-MainTab:CreateDropdown({
-    Name = "Symbol Menu",
-    Options = {"@", "!", "$", "%", "*", "#", "_", "Ω", "Σ"},
-    CurrentOption = {"@"},
-    Callback = function(o)
-        SelectedSymbol = o[1]
-    end,
-})
+---------------- EMOTE SYSTEM ----------------
+gazeBtn.MouseButton1Click:Connect(function()
+if gazeLoaded then
+gazeBtn.Text = "EMOTES LOADED ✅"
+return
+end
 
-MainTab:CreateSlider({
-    Name = "Delay",
-    Range = {1.0, 5},
-    Increment = 0.1,
-    Suffix = "s",
-    CurrentValue = 2.0,
-    Callback = function(v)
-        SpamDelay = v
-    end,
-})
+gazeLoaded = true  
+gazeBtn.Text = "LOADING..."  
 
-MainTab:CreateButton({
-    Name = "Xudai Shuru",
-    Callback = function()
-        if not IsSpamming then
-            IsSpamming = true
-            SendSpam()
-        end
-    end,
-})
+task.spawn(function()  
+    pcall(function()  
+        loadstring(game:HttpGet(  
+            "https://raw.githubusercontent.com/Gazer-Ha/Gaze-stuff/refs/heads/main/Gaze%20emote"  
+        ))()  
+    end)  
+    gazeBtn.Text = "EMOTES LOADED ✅"  
+end)
 
-MainTab:CreateButton({
-    Name = "Xudai Roko",
-    Callback = function()
-        IsSpamming = false
-    end,
-})
+end)
 
-local FeatureTab = Window:CreateTab("Features", 4483362458)
+---------------- GAME HUB ----------------
+redzBtn.MouseButton1Click:Connect(function()
+if redzLoaded then
+redzBtn.Text = "GAME HUB LOADED ✅"
+return
+end
 
-FeatureTab:CreateToggle({
-    Name = "Mod Detector",
-    CurrentValue = true,
-    Callback = function(v)
-        ModDetector = v
-    end
-})
+redzLoaded = true  
+redzBtn.Text = "LOADING..."  
 
-FeatureTab:CreateToggle({
-    Name = "Ultra No Sit",
-    Callback = function(v)
-        NoSit = v
-    end
-})
+task.spawn(function()  
+    pcall(function()  
+        loadstring(game:HttpGet(  
+            "https://rawscripts.net/raw/Brookhaven-RP-Brookhaven-Redz-Hub-Cracked-77478"  
+        ))()  
+    end)  
+    redzBtn.Text = "GAME HUB LOADED ✅"  
+end)
 
--- Reset Player Button
-FeatureTab:CreateButton({
-    Name = "Reset Player",
-    Callback = function()
-        local char = game.Players.LocalPlayer.Character
+end)
 
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
+---------------- TOGGLE ----------------
+toggleBtn.MouseButton1Click:Connect(function()
+frame.Visible = not frame.Visible
+end)
 
-            if hum then
-                hum.Health = 0
-            end
-        end
-    end
-})
-
--- Rejoin Server Button
-FeatureTab:CreateButton({
-    Name = "Rejoin Server",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(
-            game.PlaceId,
-            game.Players.LocalPlayer
-        )
-    end
-})
-
-FeatureTab:CreateButton({
-    Name = "Reset RP Name",
-    Callback = function()
-        CustomNameActive = false
-
-        local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
-
-        if remote then
-            remote:FireServer("SetRPName", "")
-        end
-
-        Rayfield:Notify({
-            Title = "Name Reset",
-            Content = "Custom RP Name disabled.",
-            Duration = 3
-        })
-    end
-})
-
-local CreditTab = Window:CreateTab("Credits", 4483362458)
-
-CreditTab:CreateLabel("DmNx Ji 👑")
-
--- // EXECUTE \\ --
-StartupMessage()
+updateDelayUI()
+print("✅ SAM V1 LOADED — CORE HUB + AUDIO + EMOTES ACTIVE")
