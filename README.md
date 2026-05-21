@@ -25,8 +25,6 @@ MainTab:CreateInput({
         end
     end,
 })
-MainTab:CreateInput({
-    Name = "Target Name",
 
 --// ITEMS //--
 local Items = {
