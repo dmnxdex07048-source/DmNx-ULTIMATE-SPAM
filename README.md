@@ -1,94 +1,84 @@
---// DmNx ULTIMATE SPAM //--
---// OWNER : DmNx Ji //--
---// TESTER : DmNxZeru //--
-
---// LOAD RAYFIELD //--
+-- // LOAD RAYFIELD IMMEDIATELY \\ --
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
---// SETTINGS //--
+-- // SETTINGS & STATE \\ --
 local TargetName = "Enemy"
 local SelectedSymbol = "@"
-local SpamDelay = 2
+local SpamDelay = 2.0 
 local IsSpamming = false
+local CustomNameActive = true
 local LastItem = ""
 local ChatCounter = 0
 
---// ITEMS //--
-local Items = {
-    "ㄒ爪Ҝ乂 ME ICE",
-    "ㄒ爪Ҝ乂 ME ROCKET",
-    "ㄒ爪Ҝ乂 ME LAPTOP",
-    "ㄒ爪Ҝ乂 ME RDP",
-    "ㄒ爪Ҝ乂 ME CANVAS",
-    " ㄒ爪Ҝ乂 ME BAG",
-    "ㄒ爪Ҝ乂 ME COLLEGE",
-    "ㄒ爪Ҝ乂 ME CVR",
-    "ㄒ爪Ҝ乂 ME CHOCO",
-    "ㄒ爪Ҝ乂 ME TOY",
-    "ㄒ爪Ҝ乂 ME SUN",
-    "ㄒ爪Ҝ乂 ME BANANA",
-    "ㄒ爪Ҝ乂 ME PAINT"
-}
+local AntiAFK, AntiFling, AntiBang, NoSit, ModDetector = false, false, false, false, true
 
---// CHAT FUNCTION //--
-local function SendMessage(msg)
+-- // RP NAME STYLE \\ --
+local RP_NAME = "🚨💢 DmNx Ji USER 💢🚨"
+
+-- // INITIAL EXECUTION MESSAGE \\ --
+local function StartupMessage()
+    local msg = "🚨 BEWARE ! DmNx Ji USER DETECTED 🚨 !!"
     local ChatEvent = game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
-
     if ChatEvent then
         ChatEvent.SayMessageRequest:FireServer(msg, "All")
     else
-        local channel = game:GetService("TextChatService"):FindFirstChild("TextChannels")
-        if channel and channel:FindFirstChild("RBXGeneral") then
-            channel.RBXGeneral:SendAsync(msg)
+        local channel = game:GetService("TextChatService"):FindFirstChild("TextChannels") and game:GetService("TextChatService").TextChannels:FindFirstChild("RBXGeneral")
+        if channel then
+            channel:SendAsync(msg)
         end
     end
 end
 
---// RANDOM ITEM //--
-local function GetItem()
-    local item = Items[math.random(1, #Items)]
+-- // MOD WARNING UI \\ --
+local function ShowModWarning(name)
+    local sg = Instance.new("ScreenGui", game.CoreGui)
+    local frame = Instance.new("Frame", sg)
 
-    while item == LastItem do
-        item = Items[math.random(1, #Items)]
-    end
+    frame.Size = UDim2.new(1, 0, 0.3, 0)
+    frame.Position = UDim2.new(0, 0, 0.35, 0)
+    frame.BackgroundColor3 = Color3.new(0.5, 0, 0)
+    frame.BackgroundTransparency = 0.3
 
-    LastItem = item
-    return item
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(1, 0, 1, 0)
+    txt.Text = "⚠️ MODERATOR JOINED: " .. name:upper() .. " ⚠️"
+    txt.TextColor3 = Color3.new(1, 1, 1)
+    txt.TextScaled = true
+    txt.Font = Enum.Font.SourceSansBold
+
+    task.delay(5, function()
+        sg:Destroy()
+    end)
 end
 
---// RP NAME ENABLE //--
-local RPNameEnabled = true
-
---// RGB RP NAME //--
+-- // RGB NAME & BROOKHAVEN SYNC \\ --
 task.spawn(function()
     while task.wait(0.1) do
+        if not CustomNameActive then
+            break
+        end
+
         pcall(function()
-
-            -- STOP NAME IF DISABLED
-            if not RPNameEnabled then
-                return
-            end
-
             local char = game.Players.LocalPlayer.Character
 
             if char then
                 local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
 
                 if remote then
-                    remote:FireServer("SetRPName", CustomName)
+                    remote:FireServer("SetRPName", RP_NAME)
                 end
 
                 local head = char:FindFirstChild("Head")
 
                 if head then
-                    for _,v in pairs(head:GetChildren()) do
+                    for _, v in pairs(head:GetChildren()) do
                         if v:IsA("BillboardGui") then
-                            local txt = v:FindFirstChildOfClass("TextLabel")
+                            local label = v:FindFirstChildOfClass("TextLabel")
 
-                            if txt then
-                                txt.Text = CustomName
-                                txt.TextColor3 = Color3.fromHSV(tick()%5/5,1,1)
-                                txt.Font = Enum.Font.RobotoMono
+                            if label then
+                                label.Text = RP_NAME
+                                label.Font = Enum.Font.RobotoMono
+                                label.TextColor3 = Color3.fromHSV(tick() % 3 / 3, 1, 1)
                             end
                         end
                     end
@@ -98,105 +88,184 @@ task.spawn(function()
     end
 end)
 
---// SPAM ENGINE //--
-local function StartSpam()
+-- // SMOOTH PHYSICS & ULTRA NO SIT \\ --
+game:GetService("RunService").Heartbeat:Connect(function()
+    local char = game.Players.LocalPlayer.Character
+
+    if char then
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChildOfClass("Humanoid")
+
+        if hum and NoSit then
+            hum.Sit = false
+
+            if hum:GetState() == Enum.HumanoidStateType.Seated then
+                hum:ChangeState(Enum.HumanoidStateType.Running)
+            end
+        end
+    end
+end)
+
+-- // MOD DETECTOR \\ --
+game.Players.PlayerAdded:Connect(function(player)
+    if ModDetector then
+        if player:GetRankInGroup(4353493) >= 10 or player.UserId == 23204300 then
+            IsSpamming = false
+            ShowModWarning(player.Name)
+        end
+    end
+end)
+
+-- // SPAM ENGINE \\ --
+local function GetNewItem()
+    local Items = {
+        "ICE",
+        "ROCKET",
+        "LAPTOP",
+        "RDP",
+        "CANVAS",
+        "BAG",
+        "COLLEGE",
+        "CVR",
+        "CHOCO",
+        "TOY",
+        "SUN",
+        "BANANA",
+        "PAINT"
+    }
+
+    local chosen = Items[math.random(1, #Items)]
+
+    while chosen == LastItem do
+        chosen = Items[math.random(1, #Items)]
+    end
+
+    LastItem = chosen
+    return chosen
+end
+
+local function SendSpam()
     task.spawn(function()
         while IsSpamming do
             ChatCounter = ChatCounter + 1
 
-            local Noise = " " .. string.char(math.random(200,250))
             local Message = ""
+            local Noise = " " .. string.char(math.random(200, 250))
 
             if ChatCounter >= 7 then
-                Message = "👑 MADE BY DmNx Ji😛🔥" .. Noise
+                Message = "👑 MADE BY DmNx Ji 👑" .. Noise
                 ChatCounter = 0
             else
-                local item = GetItem()
-                local line = string.rep(SelectedSymbol, 35)
+                local Item = GetNewItem()
+                local SL = string.rep(SelectedSymbol, 35)
 
                 Message =
-                    line.."\n"..
-                    line.."\n"..
-                    line.."\n"..
-                    "("..TargetName:upper()..") "..item..Noise
+                    SL ..
+                    "\n" ..
+                    SL ..
+                    "\n" ..
+                    SL ..
+                    "\n(" ..
+                    TargetName:upper() ..
+                    ") TMX MEH " ..
+                    Item ..
+                    Noise
             end
 
-            SendMessage(Message)
+            local ChatEvent =
+                game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents")
+
+            if ChatEvent then
+                ChatEvent.SayMessageRequest:FireServer(Message, "All")
+            else
+                local channel =
+                    game:GetService("TextChatService"):FindFirstChild("TextChannels") and
+                    game:GetService("TextChatService").TextChannels:FindFirstChild("RBXGeneral")
+
+                if channel then
+                    channel:SendAsync(Message)
+                end
+            end
+
             task.wait(SpamDelay)
         end
     end)
 end
 
---// WINDOW //--
+-- // WINDOW SETUP \\ --
 local Window = Rayfield:CreateWindow({
-    Name = "DmNx ULTIMATE SPAM",
-    LoadingTitle = "DmNx ULTIMATE SPAM",
-    LoadingSubtitle = "By DmNx",
-    ConfigurationSaving = {
-        Enabled = false,
-    },
-    Discord = {
-        Enabled = false,
-    },
-    KeySystem = false,
+    Name = "DmNx Ji | Made For H8 Xudai",
+    LoadingTitle = "DmNx Ji",
+    LoadingSubtitle = "By DmNx Ji",
 })
 
---// MAIN TAB //--
-local MainTab = Window:CreateTab("Main", 4483362458)
+local MainTab = Window:CreateTab("Spammer", 4483362458)
 
 MainTab:CreateInput({
     Name = "Target Name",
-    PlaceholderText = "Enter Target",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text)
-        TargetName = text
+    PlaceholderText = "Enter Name",
+    Callback = function(t)
+        TargetName = t
     end,
 })
 
 MainTab:CreateDropdown({
-    Name = "Spam Symbol",
-    Options = {"@", "#", "$", "%", "&", "*", "Ω", "Σ"},
+    Name = "Symbol Menu",
+    Options = {"@", "!", "$", "%", "*", "#", "_", "Ω", "Σ"},
     CurrentOption = {"@"},
-    Callback = function(option)
-        SelectedSymbol = option[1]
+    Callback = function(o)
+        SelectedSymbol = o[1]
     end,
 })
 
 MainTab:CreateSlider({
-    Name = "Spam Delay",
-    Range = {1,5},
+    Name = "Delay",
+    Range = {1.0, 5},
     Increment = 0.1,
-    Suffix = " Seconds",
-    CurrentValue = 2,
-    Callback = function(value)
-        SpamDelay = value
+    Suffix = "s",
+    CurrentValue = 2.0,
+    Callback = function(v)
+        SpamDelay = v
     end,
 })
 
 MainTab:CreateButton({
-    Name = "START SPAM",
+    Name = "Xudai Shuru",
     Callback = function()
         if not IsSpamming then
             IsSpamming = true
-            StartSpam()
+            SendSpam()
         end
     end,
 })
 
 MainTab:CreateButton({
-    Name = "STOP SPAM",
+    Name = "Xudai Roko",
     Callback = function()
         IsSpamming = false
     end,
 })
 
---// FEATURES TAB //--
-
 local FeatureTab = Window:CreateTab("Features", 4483362458)
 
--- RESET CHARACTER
+FeatureTab:CreateToggle({
+    Name = "Mod Detector",
+    CurrentValue = true,
+    Callback = function(v)
+        ModDetector = v
+    end
+})
+
+FeatureTab:CreateToggle({
+    Name = "Ultra No Sit",
+    Callback = function(v)
+        NoSit = v
+    end
+})
+
+-- Reset Player Button
 FeatureTab:CreateButton({
-    Name = "Reset Character",
+    Name = "Reset Player",
     Callback = function()
         local char = game.Players.LocalPlayer.Character
 
@@ -207,10 +276,10 @@ FeatureTab:CreateButton({
                 hum.Health = 0
             end
         end
-    end,
+    end
 })
 
--- REJOIN
+-- Rejoin Server Button
 FeatureTab:CreateButton({
     Name = "Rejoin Server",
     Callback = function()
@@ -218,258 +287,31 @@ FeatureTab:CreateButton({
             game.PlaceId,
             game.Players.LocalPlayer
         )
-    end,
-})
-
--- ANTI SIT
-FeatureTab:CreateToggle({
-    Name = "Anti Sit",
-    CurrentValue = false,
-    Callback = function(state)
-        getgenv().NoSit = state
-    end,
-})
-
-game:GetService("RunService").Heartbeat:Connect(function()
-    if getgenv().NoSit then
-        local char = game.Players.LocalPlayer.Character
-
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-
-            if hum then
-                hum.Sit = false
-            end
-        end
     end
-end)
+})
 
--- RGB RP NAME
-FeatureTab:CreateToggle({
-    Name = "RGB RP Name",
-    CurrentValue = true,
-    Callback = function(state)
-        RPNameEnabled = state
+FeatureTab:CreateButton({
+    Name = "Reset RP Name",
+    Callback = function()
+        CustomNameActive = false
 
         local remote = game:GetService("ReplicatedStorage"):FindFirstChild("FocusPocus")
 
-        if not state and remote then
+        if remote then
             remote:FireServer("SetRPName", "")
         end
-    end,
-})
 
--- WALKSPEED
-FeatureTab:CreateSlider({
-    Name = "WalkSpeed",
-    Range = {16, 100},
-    Increment = 1,
-    Suffix = " WS",
-    CurrentValue = 16,
-    Callback = function(v)
-        local hum = game.Players.LocalPlayer.Character and
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-
-        if hum then
-            hum.WalkSpeed = v
-        end
-    end,
-})
-
--- JUMPPOWER
-FeatureTab:CreateSlider({
-    Name = "JumpPower",
-    Range = {50, 200},
-    Increment = 5,
-    Suffix = " JP",
-    CurrentValue = 50,
-    Callback = function(v)
-        local hum = game.Players.LocalPlayer.Character and
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-
-        if hum then
-            hum.JumpPower = v
-        end
-    end,
-})
-
--- INFINITE JUMP
-getgenv().InfiniteJump = false
-
-FeatureTab:CreateToggle({
-    Name = "Infinite Jump",
-    CurrentValue = false,
-    Callback = function(v)
-        getgenv().InfiniteJump = v
-    end,
-})
-
-game:GetService("UserInputService").JumpRequest:Connect(function()
-    if getgenv().InfiniteJump then
-        local hum = game.Players.LocalPlayer.Character and
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-
-        if hum then
-            hum:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
+        Rayfield:Notify({
+            Title = "Name Reset",
+            Content = "Custom RP Name disabled.",
+            Duration = 3
+        })
     end
-end)
-
--- NOCLIP
-getgenv().Noclip = false
-
-FeatureTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Callback = function(v)
-        getgenv().Noclip = v
-    end,
 })
 
-game:GetService("RunService").Stepped:Connect(function()
-    if getgenv().Noclip then
-        local char = game.Players.LocalPlayer.Character
-
-        if char then
-            for _,v in pairs(char:GetDescendants()) do
-                if v:IsA("BasePart") then
-                    v.CanCollide = false
-                end
-            end
-        end
-    end
-end)
-
--- FULLBRIGHT
-FeatureTab:CreateToggle({
-    Name = "FullBright",
-    CurrentValue = false,
-    Callback = function(v)
-
-        if v then
-            game:GetService("Lighting").Brightness = 5
-            game:GetService("Lighting").ClockTime = 14
-            game:GetService("Lighting").FogEnd = 100000
-            game:GetService("Lighting").GlobalShadows = false
-        else
-            game:GetService("Lighting").Brightness = 2
-            game:GetService("Lighting").GlobalShadows = true
-        end
-    end,
-})
-
--- FLY
-getgenv().Fly = false
-
-FeatureTab:CreateToggle({
-    Name = "Fly",
-    CurrentValue = false,
-    Callback = function(v)
-        getgenv().Fly = v
-
-        local player = game.Players.LocalPlayer
-        local char = player.Character
-        if not char then return end
-
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-
-        if v then
-            local bv = Instance.new("BodyVelocity")
-            bv.Name = "DmNxFly"
-            bv.MaxForce = Vector3.new(999999,999999,999999)
-            bv.Velocity = Vector3.new(0,0,0)
-            bv.Parent = hrp
-
-            task.spawn(function()
-                while getgenv().Fly and hrp do
-                    task.wait()
-                    bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 60
-                end
-
-                if bv then
-                    bv:Destroy()
-                end
-            end)
-        else
-            local fly = hrp:FindFirstChild("DmNxFly")
-            if fly then
-                fly:Destroy()
-            end
-        end
-    end,
-})
-
--- ANTI AFK
-FeatureTab:CreateButton({
-    Name = "Anti AFK",
-    Callback = function()
-        local vu = game:GetService("VirtualUser")
-
-        game.Players.LocalPlayer.Idled:Connect(function()
-            vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-            task.wait(1)
-            vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-        end)
-
-        Rayfield:Notify({
-            Title = "DmNx ULTIMATE SPAM",
-            Content = "Anti AFK Enabled",
-            Duration = 3,
-        })
-    end,
-})
-
--- FPS BOOST
-FeatureTab:CreateButton({
-    Name = "FPS Boost",
-    Callback = function()
-        for _,v in pairs(game:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.Material = Enum.Material.Plastic
-                v.Reflectance = 0
-            end
-        end
-
-        game:GetService("Lighting").GlobalShadows = false
-
-        Rayfield:Notify({
-            Title = "DmNx ULTIMATE SPAM",
-            Content = "FPS Boost Enabled",
-            Duration = 3,
-        })
-    end,
-})
-
--- COPY DISCORD
-FeatureTab:CreateButton({
-    Name = "Copy Discord Invite",
-    Callback = function()
-        if setclipboard then
-            setclipboard("https://discord.gg/dwZHZBVje")
-        end
-
-        Rayfield:Notify({
-            Title = "DmNx",
-            Content = "Discord Link Copied",
-            Duration = 3,
-        })
-    end,
-})
-
---// CREDITS TAB //--
 local CreditTab = Window:CreateTab("Credits", 4483362458)
 
-CreditTab:CreateLabel("OWNER - DmNx Ji")
-CreditTab:CreateLabel("TESTER - DmNxZeru")
-CreditTab:CreateLabel("USER - YOU🎀")
+CreditTab:CreateLabel("DmNx Ji 👑")
 
---// STARTUP MESSAGE //--
-SendMessage("🔥 DmNx ULTIMATE SPAM LOADED 🔥")
-
-Rayfield:Notify({
-    Title = "DmNx ULTIMATE SPAM",
-    Content = "Loaded Successfully!",
-    Duration = 5,
-    Image = 4483362458,
-})
+-- // EXECUTE \\ --
+StartupMessage()
